@@ -1,0 +1,29 @@
+doctype html
+head
+	script(src='/public/js/angular.min.js')
+	script(src='/public/js/app.angular.js')
+html(lang="en", ng-app="audioServerApp")
+	body
+	title= title
+	<audio id="audio" controls="controls">
+		<source id="audioSource" src=""></source>
+		Your browser does not support the audio format.
+	</audio>
+	<div ng-controller="DirsListController">
+		<ul id="list" style="list-style: none">
+			<li ng-repeat="el in folders">
+				<a href="#" data-value="{{el.path}}">{{el.name}}</a>
+			</li>
+			<!-- <li>Audio Files
+				<ul id="list">
+
+					<li></li>
+					<li><a href="#" data-value="/tracks/02. Bombs away.mp3">Bombs away</a></li>
+					<li><a href="#" data-value="/tracks/04. We are.mp3">We are</a></li>
+					
+				</ul>
+			</li> -->
+		</ul>
+	</div>
+
+	script(src='/public/js/changeAudio.js')
