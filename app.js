@@ -15,15 +15,39 @@ app.get('/', function (req, res) {
 })
 
 // Informacion de la carpeta y directorios
-app.get('/folders/data/:dir?', function (req, res) {
-    var dir = req.params.dir ? req.params.dir : '';
+app.get('/folders/data/*?', function (req, res) {
+    var dir = req.params[0] ? req.params[0] : '';
     var dirPath = path.join(__dirname, 'tracks/'+dir);
     fs.readdir(dirPath, (err, files) => {
-        files = files.filter(function(dirOrFile) {
+        if (err) {
+            console.log(err);
+            res.send({'error':'File or Dir not found'});
+        }
+
+        promises = files.filter(function(dirOrFile) {
             //filtro los que terminan en .png, .jpg y.jpeg
             return dirOrFile.match('\.png$|\.jpg$|\.jpeg$') === null; 
+        }).map(function(dirOrFile){
+            return new Promise((resolve, reject) => {
+                var fullPath = path.join(dirPath, dirOrFile);
+                fs.lstat(fullPath, (err, stats) => {
+                    if(err){ reject(console.log(err)); }
+                    dirOrFilePath = path.join('tracks/'+dir,dirOrFile);
+
+                    if (stats.isDirectory()) {
+                        resolve( {'name':dirOrFile, 'path': dirOrFilePath, 'type':'dir'} );
+                    }else if(stats.isFile()){
+                        resolve( {'name':dirOrFile, 'path': dirOrFilePath, 'type':'file'} );
+                    }
+
+                    resolve({'name':dirOrFile,'path': dirOrFilePath, 'type':'unknown'});
+                });
+            });
         });
-        res.send(files);
+
+        Promise.all(promises).then(function(results){
+            res.send(results);
+        })
     });
 })
 
