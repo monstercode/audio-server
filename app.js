@@ -15,7 +15,7 @@ app.get('/', function (req, res) {
 })
 
 // Informacion de la carpeta y directorios
-app.get('/folders/data/*?', function (req, res) {
+app.get('/folders/data*?', function (req, res) {
     var dir = req.params[0] ? req.params[0] : '';
     var dirPath = path.join(__dirname, 'tracks/'+dir);
     fs.readdir(dirPath, (err, files) => {
@@ -32,15 +32,14 @@ app.get('/folders/data/*?', function (req, res) {
                 var fullPath = path.join(dirPath, dirOrFile);
                 fs.lstat(fullPath, (err, stats) => {
                     if(err){ reject(console.log(err)); }
-                    dirOrFilePath = path.join('tracks/'+dir,dirOrFile);
 
                     if (stats.isDirectory()) {
-                        resolve( {'name':dirOrFile, 'path': dirOrFilePath, 'type':'dir'} );
+                        resolve( {'name':dirOrFile, 'path': path.join('folders/data/'+dir,dirOrFile), 'type':'dir'} );
                     }else if(stats.isFile()){
-                        resolve( {'name':dirOrFile, 'path': dirOrFilePath, 'type':'file'} );
+                        resolve( {'name':dirOrFile, 'path': path.join('tracks/'+dir,dirOrFile), 'type':'file'} );
                     }
 
-                    resolve({'name':dirOrFile,'path': dirOrFilePath, 'type':'unknown'});
+                    resolve({'name':dirOrFile,'path': dirOrFile, 'type':'unknown'});
                 });
             });
         });

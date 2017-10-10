@@ -1,64 +1,35 @@
+'use strict';
 // Define the `dirApp` module
 var audioServerApp = angular.module('audioServerApp', []);
 
-// Define the `PhoneListController` controller on the `dirApp` module
-audioServerApp.controller('DirsListController', function DirsListController($scope) {
-  $scope.folders = [
-    {
-      name: "01 - Ambitions –Introduction–.mp3",
-      path: "tracks/One Ok Rock - Ambitions/01 - Ambitions –Introduction–.mp3"
-    },
-    {
-      name: "02 - Bombs away.mp3",
-      path: "tracks/One Ok Rock - Ambitions/02 - Bombs away.mp3"
-    },
-    {
-      name: "03 - Taking Off.mp3",
-      path: "tracks/One Ok Rock - Ambitions/03 - Taking Off.mp3"
-    },
-    {
-      name: "04 - We are.mp3",
-      path: "tracks/One Ok Rock - Ambitions/04 - We are.mp3"
-    },
-    {
-      name: "05 - 20-20.mp3",
-      path: "tracks/One Ok Rock - Ambitions/05 - 20-20.mp3"
-    },
-    {
-      name: "06 - Always coming back.mp3",
-      path: "tracks/One Ok Rock - Ambitions/06 - Always coming back.mp3"
-    },
-    {
-      name: "07 - Bedroom Warfare.mp3",
-      path: "tracks/One Ok Rock - Ambitions/07 - Bedroom Warfare.mp3"
-    },
-    {
-      name: "08 - Lost in Tonight.mp3",
-      path: "tracks/One Ok Rock - Ambitions/08 - Lost in Tonight.mp3"
-    },
-    {
-      name: "09 - I was King.mp3",
-      path: "tracks/One Ok Rock - Ambitions/09 - I was King.mp3"
-    },
-    {
-      name: "10 - ONE OK ROCK feat. Avril Lavigne - Listen.mp3",
-      path: "tracks/One Ok Rock - Ambitions/10 - ONE OK ROCK feat. Avril Lavigne - Listen.mp3"
-    },
-    {
-      name: "11 - One Way Ticket.mp3",
-      path: "tracks/One Ok Rock - Ambitions/11 - One Way Ticket.mp3"
-    },
-    {
-      name: "12 - Bon Voyage.mp3",
-      path: "tracks/One Ok Rock - Ambitions/12 - Bon Voyage.mp3"
-    },
-    {
-      name: "13 - Start Again.mp3",
-      path: "tracks/One Ok Rock - Ambitions/13 - Start Again.mp3"
-    },
-    {
-      name: "14 - ONE OK ROCK feat. 5 Seconds of Summer - Take what you want.mp3",
-      path: "tracks/One Ok Rock - Ambitions/14 - ONE OK ROCK feat. 5 Seconds of Summer - Take what you want.mp3"
-    }  
-  ];
+// Define the `PhoneListController` controller on the `phonecatApp` module
+audioServerApp.controller('AudioController', function AudioController($scope, $http) {
+    
+  $scope.setAudioSrc = function(audioSrc){
+    $scope.mainAudioSrc = audioSrc;
+    var audio = document.getElementById('audio');
+    audio.load();
+    audio.play();
+  };
+
+  $scope.setFolder = function(folder){
+      $http.get(folder).then(function(response) {
+      $scope.folders = response.data;
+      // EL boton de regresar es la nueva url menos la ultima parte despues de la ultima /
+      var goBack = folder.split('/');
+      goBack.pop();   
+      $scope.goBack = goBack.join('/');
+    });
+  };
+
+  //One Ok Rock - Ambitions
+  $http.get('folders/data/').then(function(response) {
+    $scope.goBack = 'folders/data/';
+    $scope.folders = response.data;
+    if (response.data.length > 0 && 'file' == response.data[0].type) {
+        $scope.mainAudioSrc = response.data[0].path;
+        var audio = document.getElementById('audio');
+        audio.load();;
+    }
+  });
 });
