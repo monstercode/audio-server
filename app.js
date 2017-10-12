@@ -9,6 +9,8 @@ var fs = require('fs');
 var path = require('path');
 var id3 = require('id3js');
 
+var config = require('./config.js');
+
 // Home
 app.get('/', function (req, res) {
   res.render('index', { title: 'Cool Audio Server'});
@@ -17,7 +19,7 @@ app.get('/', function (req, res) {
 // Informacion de la carpeta y directorios
 app.get('/folders/data*?', function (req, res) {
     var dir = req.params[0] ? req.params[0] : '';
-    var dirPath = path.join(__dirname, 'tracks/'+dir);
+    var dirPath = path.join(config.audio_path, '/'+dir);
     fs.readdir(dirPath, (err, files) => {
         if (err) {
             console.log(err);
@@ -53,7 +55,7 @@ app.get('/folders/data*?', function (req, res) {
 // Informacion del tag de la cancion
 app.get('/tracks/data/:song', function (req, res) {
   var file = req.params.song;
-  var filePath = path.join(__dirname, 'tracks/'+file);
+  var filePath = path.join(config.audio_path, '/'+file);
 
   id3({ file:filePath, type: id3.OPEN_LOCAL }, function(err, tags) {
       res.send(tags);
@@ -65,7 +67,7 @@ app.get('/tracks/*?', function (req, res) {
 console.log(req.params[0]);
   //var file = req.params.song;
   var file = req.params[0];
-  var filePath = path.join(__dirname, 'tracks/'+file);
+  var filePath = path.join(config.audio_path, '/'+file);
     var stat = fs.statSync(filePath);
 
     res.writeHead(200, {
