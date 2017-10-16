@@ -3,7 +3,8 @@ const app = express()
 
 // lo que esta en public accede de forma estatica
 app.use("/public", express.static(__dirname + '/public'));
-app.set('view engine', 'pug')
+app.use(express.static(__dirname + '/views'));
+//app.set('view engine', 'pug')
 
 var fs = require('fs');
 var path = require('path');
@@ -13,7 +14,8 @@ var config = require('./config.js');
 
 // Home
 app.get('/', function (req, res) {
-  res.render('index', { title: 'Cool Audio Server'});
+  //res.render('index', { title: 'Cool Audio Server'});
+  res.render('views/index.html');
 })
 
 // Informacion de la carpeta y directorios
@@ -82,6 +84,6 @@ console.log(req.params[0]);
 })
 
 app.listen(8080, function () {
-  console.log('Listening on port 8000!')
+  console.log('Listening on port 8080!')
 })
 
