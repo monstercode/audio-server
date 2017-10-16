@@ -1,6 +1,6 @@
 'use strict';
 // Define the `dirApp` module
-var audioServerApp = angular.module('audioServerApp', []);
+var audioServerApp = angular.module('audioServerApp', ['ngAnimate']);
 
 // Define the `PhoneListController` controller on the `phonecatApp` module
 audioServerApp.controller('AudioController', function AudioController($scope, $http) {
@@ -36,6 +36,15 @@ audioServerApp.controller('AudioController', function AudioController($scope, $h
       goBack.pop();   
       $scope.goBack = goBack.join('/');
     });
+  };
+
+
+  
+  $scope.removeFromPlaylist = function(index){
+    if (index < $scope.playlistCurrent) {
+      $scope.playlistCurrent -= 1;
+    }
+    $scope.playlist.splice(index, 1);
   };
 
   $scope.addAllToPlaylist = function(){
