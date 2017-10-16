@@ -14,7 +14,7 @@
 					<Your>browser does not support the audio format.</Your>
 			</audio>
 			<span class="element" ng-src="{{goBack}}" ng-click="setFolder(goBack)">
-				<img class="go-back-arrow" src="public/img/go-back-arrow.png">
+				<span class="go-back-arrow">↺</span>
 			</span>
 			<div class="add-to-playlist" ng-click="addAllToPlaylist()"> Add all to playlist </div>
 			<div class="container">
@@ -22,11 +22,11 @@
 					<ul>
 						<li ng-repeat="el in folders">
 							<span ng-if="'dir' == el.type">
-								<span class="folder" ng-src="{{el.path}}" ng-click="setFolder(el.path)" data-type="{{el.type}}"> → {{el.name}}
+								<span class="folder" ng-src="{{el.path}}" ng-click="setFolder(el.path)"> → {{el.name}}
 								</span>
 							</span>
 							<span ng-if="'file' == el.type">
-								<span class="file"> ► {{el.name}}
+								<span class="file" ng-src="{{el.path}}" ng-click="addToPlaylist(el)"> ► {{el.name}}
 								</span>
 							</span>	
 						</li>
@@ -44,9 +44,14 @@
 			</div>
 		</div>
 		<style type="text/css">
-			ul{list-style: none;}
+			body{
+				background-color: #353535;
+				padding: 10px 25px;
+			}
+			#audio{background-color: #A7A7A7;}
+			ul{list-style: none; padding: 0}
 			.navigation-folder {
-				color: #6a98ec;
+				color: #fff;
 			}
 			.navigation-folder .folder{
 				cursor: pointer;
@@ -54,18 +59,22 @@
 			.navigation-folder .file{
 				cursor: default;
 			}
-			.go-back-arrow{width:38px;}
-			.add-to-playlist:hover{
-				background-color: #6a98ec;
+			.go-back-arrow{
+				font-size: 48px;
 				color: #fff;
+				cursor: pointer;
+			}
+			.add-to-playlist:hover{
+				background-color: #fff;
+				color: #353535;
 			}
 			.add-to-playlist{
 				text-align: center;
-				color: #6a98ec;
-				background-color: #fff;
+				color: #fff;
+				background-color: transparent;
 				transition: 1s;
 				border-radius: 15px;
-				border: 1px solid #6a98ec;
+				border: 1px solid #fff;
 				padding: 5px 20px;
 				cursor: pointer;
 				width: 200px;
@@ -74,6 +83,10 @@
 				display: inline-block;
 				width: 40%;
 				vertical-align: top;
+			}
+			.playlist{
+				color: #fff;
+				cursor: pointer;
 			}
 		</style>
 	</body>

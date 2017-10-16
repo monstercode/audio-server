@@ -8,44 +8,25 @@ audioServerApp.controller('AudioController', function AudioController($scope, $h
   $scope.playlist = [];
   $scope.playlistCurrent = -1;
   $scope.audio = document.getElementById('audio')
-  $scope.playing = !$scope.audio.paused
+  $scope.audio.volume = 0.8;
+
   $scope.setAudioSrc = function(index, audioSrc){
     $scope.playlistCurrent = index;
     $scope.audio.src = audioSrc;    
     $scope.audio.load();
     $scope.audio.play();
-  $scope.playing = !$scope.audio.paused
   };
 
   $scope.audio.addEventListener('ended', function(){
     $scope.playlistCurrent += 1;
-    console.log($scope.playlistCurrent, $scope.playlist.length);
     if ($scope.playlistCurrent < $scope.playlist.length ) {
       $scope.audio.src = $scope.playlist[$scope.playlistCurrent].path
       $scope.audio.load();
       $scope.audio.play();
     }
 
-    $scope.$apply();  // <<<<
-    $scope.playing = !$scope.audio.paused
+    $scope.$apply();
   });
-  
-  /*$scope.setAudioSrc = function(audioSrc){
-    $scope.mainAudioSrc = audioSrc;
-    var audio = document.getElementById('audio');
-    audio.load();
-    audio.play();
-  };*/
-
-  $scope.playAudio = function(){
-    $scope.audio.play();
-    $scope.playing = !$scope.audio.paused
-  }
-
-  $scope.pauseAudio = function(){
-    $scope.audio.pause();
-    $scope.playing = !$scope.audio.paused
-  }
 
   $scope.setFolder = function(folder){
       $http.get(folder).then(function(response) {
@@ -57,18 +38,19 @@ audioServerApp.controller('AudioController', function AudioController($scope, $h
     });
   };
 
-  $scope.addAllToPlaylist= function(){
+  $scope.addAllToPlaylist = function(){
       $scope.playlist = $scope.playlist.concat($scope.folders.filter(function(item){
-        return item.type == 'file';
+        return item.type == 'file' && !$scope.playlist.includes(item);
       }))
   };
 
-  /*$scope.audio.addEventListener('ended', function(){
-        $scope.class = "playButton play";
-        $scope.afspelen = false;
-        console.log("ended ");
-    });*/
+  $scope.addToPlaylist = function(audioElement){
+      if(audioElement.type == 'file' && !$scope.playlist.includes(audioElement)){
+        $scope.playlist.push(audioElement);
+      }       
+  };
 
+  // Inicializo el listado de carpetas
   $http.get('folders/data/').then(function(response) {
     $scope.goBack = 'folders/data/';
     $scope.folders = response.data;
