@@ -11,8 +11,7 @@
 	<body>
 		<div ng-controller="AudioController">
 			<audio id="audio" controls="controls">
-				<source id="audioSource" ng-src="{{mainAudioSrc}}" type="audio/mpeg">
-					<Your>browser does not support the audio format.</Your>
+				<source type="audio/mpeg">
 			</audio>
 			<span class="element" ng-src="{{goBack}}" ng-click="setFolder(goBack)">
 				<span class="go-back-arrow">↺</span>

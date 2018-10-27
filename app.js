@@ -1,10 +1,9 @@
 const express = require('express')
 const app = express()
 
-// lo que esta en public accede de forma estatica
+// Access to static files in the /public directory
 app.use("/public", express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
-//app.set('view engine', 'pug')
 
 var fs = require('fs');
 var path = require('path');
@@ -12,26 +11,27 @@ var id3 = require('id3js');
 
 var config = require('./config.js');
 
-// Home
+// Return the index.html for the home
 app.get('/', function (req, res) {
-  //res.render('index', { title: 'Cool Audio Server'});
   res.render('views/index.html');
 })
 
-// Informacion de la carpeta y directorios
+// Read the contents of the directory
 app.get('/folders/data*?', function (req, res) {
-    var dir = req.params[0] ? req.params[0] : '';
+    var dir = req.params[0] ? req.params[0].replace('/../', '') : '';
     var dirPath = path.join(config.audio_path, '/'+dir);
+    
     fs.readdir(dirPath, (err, files) => {
         if (err) {
             console.log(err);
-            res.send({'error':'File or Dir not found'});
+            res.send({'error':'File or Dir not found'});  
         }
 
         promises = files.filter(function(dirOrFile) {
-            //filtro los que terminan en .png, .jpg y.jpeg
-            return dirOrFile.match('\.png$|\.jpg$|\.jpeg$') === null; 
+            // filter files/dirs that don't intereset us. This can be improved.
+            return dirOrFile.match('\.png$|\.jpg$|\.jpeg$|\.db') === null; 
         }).map(function(dirOrFile){
+            // for each element of the result of 'ls', return if it is a file or a folder
             return new Promise((resolve, reject) => {
                 var fullPath = path.join(dirPath, dirOrFile);
                 fs.lstat(fullPath, (err, stats) => {
@@ -54,22 +54,13 @@ app.get('/folders/data*?', function (req, res) {
     });
 })
 
-// Informacion del tag de la cancion
-app.get('/tracks/data/:song', function (req, res) {
-  var file = req.params.song;
-  var filePath = path.join(config.audio_path, '/'+file);
 
-  id3({ file:filePath, type: id3.OPEN_LOCAL }, function(err, tags) {
-      res.send(tags);
-  });
-})
 
-// Streaming de la cancion
+// Streaming
 app.get('/tracks/*?', function (req, res) {
-console.log(req.params[0]);
-  //var file = req.params.song;
-  var file = req.params[0];
-  var filePath = path.join(config.audio_path, '/'+file);
+    console.log('Streaming: ' + req.params[0]);
+    var file = req.params[0];
+    var filePath = path.join(config.audio_path, '/'+file);
     var stat = fs.statSync(filePath);
 
     res.writeHead(200, {
@@ -80,10 +71,61 @@ console.log(req.params[0]);
     var readStream = fs.createReadStream(filePath);
     // We replaced all the event handlers with a simple call to readStream.pipe()
     readStream.pipe(res);
-
 })
 
-app.listen(8080, function () {
-  console.log('Listening on port 8080!')
+
+/*
+// Enpoints in progress 
+
+// Get te id3 tag for mp3 files
+app.get('/tracks/data/*?', function (req, res) {
+console.log('Tag Info: ' + req.params[0]);
+  var file = req.params[0];
+  var filePath = path.join(config.audio_path, '/'+file);
+
+  id3({ file:filePath, type: id3.OPEN_LOCAL }, function(err, tags) {
+      
+      
+      // var binary = '';
+      // var bytes = new Uint8Array( tags.v2.image.data );
+      // var len = bytes.byteLength;
+      // for (var i = 0; i < len; i++) {
+      //     binary += String.fromCharCode( bytes[ i ] );
+      // }
+      
+      // tags.v2.image.image = binary
+
+      res.send(tags);
+  });
+})
+
+// Get the image in the id3 tag for mp3 files
+app.get('/tracks/img/*?', function (req, res) {
+    console.log('Tag Info: ' + req.params[0]);
+    var file = req.params[0];
+    var filePath = path.join(config.audio_path, '/'+file);
+
+    id3({ file:filePath, type: id3.OPEN_LOCAL }, function(err, tags) {
+
+        //console.log(tags.v2.image );
+        //var img = new Buffer(tags.v2.image.data, 'base64');
+        
+        var img = Buffer.from(tags.v2.image.data);
+        //let img =tags.v2.image.data;
+        console.log(tags.v2.image.mime);
+        //console.log(img.length);
+        res.writeHead(200, {
+            'Content-Type': tags.v2.image.mime,
+            //'Content-Length': tags.v2.image.data.byteLength,
+            'Content-Length': img.length,
+        });
+        res.end(img);
+    });
+})
+
+*/
+
+app.listen(config.port, function () {
+  console.log('Listening on port '+config.port+'!')
 })
 
