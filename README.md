@@ -10,7 +10,7 @@ npm install
 
 Then configure the path where your music is and the port where the server will be listening in config.js
 
-```json
+```javascript
 module.exports = {
   audio_path: '/vagrant_data/music',
   port: 9000,
